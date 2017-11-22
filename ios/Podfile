@@ -1,0 +1,27 @@
+# Uncomment the next line to define a global platform for your project
+platform :ios, '9.0'
+
+target 'payments' do
+  # Uncomment the next line if you're using Swift or would like to use dynamic frameworks
+  # use_frameworks!
+
+  # Pods for payments
+  pod 'Braintree'
+  pod 'BraintreeDropIn'
+  pod 'Braintree/DataCollector'
+  pod 'Braintree/PayPal'
+  pod 'Braintree/Venmo'
+  pod 'Braintree/Apple-Pay'
+  pod 'Braintree/3D-Secure'
+  target 'payments-tvOSTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'paymentsTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end
+
