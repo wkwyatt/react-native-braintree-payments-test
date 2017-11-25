@@ -21,7 +21,7 @@ To use PayPal payment button in the DropIn component
 If you have multiple app targets, be sure to add the return URL type for all of the targets.
 
 
-###Update `AppDelegate.m` file in XCode 
+### Update `AppDelegate.m` file in XCode 
 
 ##### NOTE: 
 REPLACE `com.your-company.Your-App.payments` with `your-bundle-ID.payments`
