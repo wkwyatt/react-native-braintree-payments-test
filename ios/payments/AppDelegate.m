@@ -11,6 +11,7 @@
 
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
+#import "BraintreeCore.h"
 
 @implementation AppDelegate
 
@@ -31,7 +32,29 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+  
+  [BTAppSwitch setReturnURLScheme:@"org.reactjs.native.example.payments"];
   return YES;
+}
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+  if ([url.scheme localizedCaseInsensitiveCompare:@"org.reactjs.native.example.payments"] == NSOrderedSame) {
+    return [BTAppSwitch handleOpenURL:url options:options];
+  }
+  return NO;
+}
+
+// If you support iOS 7 or 8, add the following method.
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+  if ([url.scheme localizedCaseInsensitiveCompare:@"org.reactjs.native.example.payments"] == NSOrderedSame) {
+    return [BTAppSwitch handleOpenURL:url sourceApplication:sourceApplication];
+  }
+  return NO;
 }
 
 @end
