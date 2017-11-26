@@ -7,6 +7,7 @@
 //
 #import "payments.h"
 #import <Foundation/Foundation.h>
+
 @implementation Payments
 
 @synthesize methodQueue = _methodQueue;
@@ -25,6 +26,7 @@ static NSString *URLScheme;
   });
   return _sharedInstance;
 }
+
 // To export a module named CalendarManager
 RCT_EXPORT_MODULE();
 //-(instancetype)init{
@@ -66,6 +68,7 @@ RCT_EXPORT_METHOD(setup:(NSString *)clientToken callback:(RCTResponseSenderBlock
     callback(@[@true]);
   }
 }
+
 RCT_EXPORT_METHOD(showPaymentViewController:(RCTResponseSenderBlock)callback)
 {
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -83,25 +86,26 @@ RCT_EXPORT_METHOD(showPaymentViewController:(RCTResponseSenderBlock)callback)
   });
 }
 
-
-RCT_EXPORT_METHOD(showDropinViewController:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(showDropIn:(NSString *)clientToken callback: (RCTResponseSenderBlock)callback)
 {
+  NSLog(@"DropIn Pressed");
   BTDropInRequest *request = [[BTDropInRequest alloc] init];
-  BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:self.braintreeClient request:request handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
+  
+  BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:clientToken request:request handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
     
-    if (error != nil) {
+    if (error) {
       NSLog(@"ERROR");
+      callback(@[error, [NSNull null]]);
     } else if (result.cancelled) {
       NSLog(@"CANCELLED");
+      callback(@[@"User cancelled payment", [NSNull null]]);
     } else {
-      // Use the BTDropInResult properties to update your UI
-      // result.paymentOptionType
-      // result.paymentMethod
-      // result.paymentIcon
-      // result.paymentDescription
+      callback(@[[NSNull null],result.paymentMethod.nonce]);
     }
+    [controller dismissViewControllerAnimated:YES completion:nil];
   }];
-  [self presentViewController:dropIn animated:YES completion:nil];
+  self.reactRoot = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+  [self.reactRoot presentViewController:dropIn animated:YES completion:nil];
 }
 
 
