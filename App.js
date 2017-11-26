@@ -34,39 +34,15 @@ export default class App extends Component {
     };
   }
   componentDidMount() {
-    // let test = Payments.concatStr();
-    // console.log(test)
-    if (Platform.OS == "ios") {
-      //ios method..
-      Payments.setup(CLIENT_TOKEN, function(success) {
-        success == true ? console.log('sucess true') : console.log('falilure true');
-      });
-    } else {
-      //android method
       Payments.init(CLIENT_TOKEN)
-    }
-
-
   }
   onItemPress = () => {
     console.log('onitem press calling');
 
-    if (Platform.OS == "ios") {
-      //ios method
-
-      Payments.showPaymentViewController(function(err, nonce) {
-        nonce != null ? console.log('sucess true', nonce) : console.log('error true');
-      });
-      // BLCPayments.braintreeSubmit(CLIENT_TOKEN)
-    } else {
-      //android method
-
-      Payments.showDropIn().then((nonce) => {
-        console.log('nonce', nonce)
-        // Do something with nonce
-      }).catch((error) => console.warn("ERROR: ", error.message));
-    }
-
+    Payments.showDropIn().then((nonce) => {
+      console.log('nonce', nonce)
+      // Do something with nonce
+    }).catch((error) => console.warn("ERROR: ", error.message));
   }
 
   render() {

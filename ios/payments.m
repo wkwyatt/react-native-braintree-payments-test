@@ -17,6 +17,7 @@ typedef void (^ Block)(id, int);
   return dispatch_get_main_queue();
 }
 static NSString *URLScheme;
+NSString *authorizationToken;
 
 + (instancetype)sharedInstance {
   static Payments *_sharedInstance = nil;
@@ -54,18 +55,20 @@ RCT_EXPORT_METHOD(setupWithURLScheme:(NSString *)clientToken urlscheme:(NSString
     callback(@[@false]);
   }
   else {
+    authorizationToken = clientToken;
     callback(@[@true]);
   }
 }
 
-RCT_EXPORT_METHOD(setup:(NSString *)clientToken callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(init:(NSString *)clientToken resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   self.braintreeClient = [[BTAPIClient alloc] initWithAuthorization:clientToken];
   if (self.braintreeClient == nil) {
-    callback(@[@false]);
+    reject(@"error", @"There was an initialization error", false);
   }
   else {
-    callback(@[@true]);
+    authorizationToken = clientToken;
+    resolve(@true);
   }
 }
 
@@ -86,21 +89,22 @@ RCT_EXPORT_METHOD(showPaymentViewController:(RCTResponseSenderBlock)callback)
   });
 }
 
-RCT_EXPORT_METHOD(showDropIn:(NSString *)clientToken callback: (RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(showDropIn:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 {
   NSLog(@"DropIn Pressed");
   BTDropInRequest *request = [[BTDropInRequest alloc] init];
   
-  BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:clientToken request:request handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
+  BTDropInController *dropIn = [[BTDropInController alloc] initWithAuthorization:authorizationToken request:request handler:^(BTDropInController * _Nonnull controller, BTDropInResult * _Nullable result, NSError * _Nullable error) {
     
     if (error) {
       NSLog(@"ERROR");
-      callback(@[error, [NSNull null]]);
+      reject(@"error", @"There was a processing error", error);
     } else if (result.cancelled) {
       NSLog(@"CANCELLED");
-      callback(@[@"User cancelled payment", [NSNull null]]);
+      resolve(@"User cancelled payment");
     } else {
-      callback(@[[NSNull null],result.paymentMethod.nonce]);
+      resolve(result.paymentMethod.nonce);
     }
     [controller dismissViewControllerAnimated:YES completion:nil];
   }];
