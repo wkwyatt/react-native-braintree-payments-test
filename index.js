@@ -1,4 +1,2 @@
-import { AppRegistry } from 'react-native';
-import App from './App';
-
-AppRegistry.registerComponent('payments', () => App);
+import Payments from './nativeModules';
+default export Payments;
